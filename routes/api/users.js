@@ -11,7 +11,7 @@ const User = require("../../models/User");
 // @access  Public
 router.get("/test", (req, res) => res.json({ msg: "Users works" }));
 
-//@route  GET api/users/register
+//@route  POST api/users/register
 // @desc  Register a User :
 // User.findOne is  being used  to find whether
 // an email already exist  in db , which will be
@@ -47,6 +47,37 @@ router.post("/register", (req, res) => {
         });
       });
     }
+  });
+});
+
+//@route  POST api/users/login
+// @desc  Returning a JWT
+
+// @access  Public
+
+router.post("/login", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  //find user by email
+  User.findOne({ email: email }).then(user => {
+    //check for user
+    if (!user) {
+      return res.status(404).json({ email: "User not FOund" });
+    }
+
+    //check password, if user exist
+    //since the password stored in db is encrypted
+    // using bcrypt ,we will use it again to compare the password
+
+    bcrypyt.compare(password, user.password).then(isMatch => {
+      if (isMatch) {
+        //if user password matches, this is where we will create JWT tokens
+        res.json({ msg: "Success" });
+      } else {
+        return res.status(404).json({ password: "Password Incorrect" });
+      }
+    });
   });
 });
 
