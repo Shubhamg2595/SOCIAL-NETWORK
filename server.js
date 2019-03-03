@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const passport = require("passport");
 /*to get access to request body we use bodyparser*/
 const users = require("./routes/api/users");
 const profiles = require("./routes/api/profiles");
@@ -21,9 +22,12 @@ mongoose
   .then(() => console.log("MOngodb connected"))
   .catch(err => console.log(err));
 
-app.get("/", (req, res) => {
-  res.send(" Social Network");
-});
+//passport middleware
+app.use(passport.initialize());
+
+//Passport Config
+//in this config file, we have passport auth. strategy
+require("./config/passport")(passport);
 
 //using my Routes
 

@@ -4,6 +4,7 @@ const gravatar = require("gravatar");
 const bcrypyt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
+const passport = require("passport");
 //load User model
 const User = require("../../models/User");
 
@@ -23,6 +24,7 @@ router.get("/test", (req, res) => res.json({ msg: "Users works" }));
 router.post("/register", (req, res) => {
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
+      console.log(user);
       return res.status(400).json({ email: "Email already Exists" });
     } else {
       const avatar = gravatar.url(req.body.email, {
@@ -78,18 +80,37 @@ router.post("/login", (req, res) => {
         const payload = { id: user.id, name: user.name, avatar: user.avatar };
 
         //Sign Token
-        jwt.sign(payload, keys.secretKey, { expiresIn: 3600 }, (err, token) => {
-          res.json({
-            success: true,
-            token: "Bearer" + token
-          });
-        });
+        jwt.sign(
+          payload,
+          keys.secretOrKey,
+          { expiresIn: 3600 },
+          (err, token) => {
+            res.json({
+              success: true,
+              token: "Bearer " + token
+            });
+          }
+        );
       } else {
         return res.status(404).json({ password: "Password Incorrect" });
       }
     });
   });
 });
+
+//@route  POST api/users/current
+// @desc  Returning current user
+
+// @access  private
+//since we have created a authenticated route,no one can access it without bearer token
+router.get(
+  "/current",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    // res.json({ msg: "Success" });
+    res.json(req.user);
+  }
+);
 
 module.exports = router;
 
