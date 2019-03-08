@@ -27,7 +27,7 @@ const ProfileSchema = new Schema({
     required: true
     //actually will be a select list in UI side
   },
-  skilss: {
+  skills: {
     type: [String], //will be array of strings separated by comma
     required: true
   },
